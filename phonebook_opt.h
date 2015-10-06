@@ -2,8 +2,8 @@
 #define _PHONEBOOK_H
 
 #define MAX_LAST_NAME_SIZE 16
+#define N_LINES 32
 
-/* original version */
 struct _details {
     char firstName[16];
     char email[16];

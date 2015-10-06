@@ -24,8 +24,9 @@ static double diff_in_second(struct timespec t1, struct timespec t2)
 int main(int argc, char *argv[])
 {
     FILE *fp;
-    int i = 0;
-    char line[MAX_LAST_NAME_SIZE];
+    int k, i = 0;
+    char lines[N_LINES][MAX_LAST_NAME_SIZE];
+
     struct timespec start, end;
     double cpu_time1, cpu_time2;
 
@@ -47,13 +48,21 @@ int main(int argc, char *argv[])
     __builtin___clear_cache((char *) pHead, (char *) pHead + sizeof(entry));
 #endif
     clock_gettime(CLOCK_REALTIME, &start);
-    while (fgets(line, sizeof(line), fp)) {
-        while (line[i] != '\0')
+
+    k=0;
+    while (fgets(lines[k], sizeof(lines[k]), fp)) {
+        while (lines[k][i] != '\0')
             i++;
-        line[i - 1] = '\0';
+        lines[k][i-1] = '\0';
         i = 0;
-        e = append(line, e);
+        k++;
+        if( k == N_LINES ) {
+            k = 0;
+            e = append_lines(lines, e);
+        }
     }
+    append_lines(lines,e);
+
     clock_gettime(CLOCK_REALTIME, &end);
     cpu_time1 = diff_in_second(start, end);
 
