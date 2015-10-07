@@ -1,8 +1,7 @@
 CC ?= gcc
 CFLAGS_common ?= -O0 -Wall -std=gnu99 
 
-#EXEC = phonebook_orig phonebook_opt
-EXEC = phonebook_opt
+EXEC = phonebook_orig phonebook_opt
 all: $(EXEC)
 
 SRCS_common = main.c

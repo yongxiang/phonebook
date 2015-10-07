@@ -25,7 +25,11 @@ int main(int argc, char *argv[])
 {
     FILE *fp;
     int k, i = 0;
+#if defined(__OPT)
     char lines[N_LINES][MAX_LAST_NAME_SIZE];
+#else
+    char line[MAX_LAST_NAME_SIZE];
+#endif
     int index;
     struct timespec start, end;
     double cpu_time1, cpu_time2;
@@ -48,7 +52,7 @@ int main(int argc, char *argv[])
     __builtin___clear_cache((char *) pHead, (char *) pHead + sizeof(entry));
 #endif
     clock_gettime(CLOCK_REALTIME, &start);
-
+#if defined(__OPT)
     k=0;
     while (fgets(lines[k], sizeof(lines[k]), fp)) {
         while (lines[k][i] != '\0')
@@ -62,7 +66,15 @@ int main(int argc, char *argv[])
         }
     }
     append_lines(lines,e);
-
+#else
+    while (fgets(line, sizeof(line),fp)) {
+        while (line[i] != '\0')
+            i++;
+        line[i-1] = '\0' ;
+        i = 0;
+        e = append(line,e);
+    }
+#endif
     clock_gettime(CLOCK_REALTIME, &end);
     cpu_time1 = diff_in_second(start, end);
 
@@ -74,16 +86,27 @@ int main(int argc, char *argv[])
     /* the givn last name to find */
     char input[MAX_LAST_NAME_SIZE] = "zyxel";
     e = pHead;
+#if defined(__OPT)
     assert(findName(input, e, &index) &&
            "Did you implement findName() in " IMPL "?");
     assert(0 == strcmp(findName(input, e, &index)->lastNames[index], "zyxel"));
+#else
+    assert(findName(input, e) &&
+           "Did you implement findName() in " IMPL "?");
+    assert(0 == strcmp(findName(input, e)->lastName, "zyxel"));
+#endif
 
 #if defined(__GNUC__)
     __builtin___clear_cache((char *) pHead, (char *) pHead + sizeof(entry));
 #endif
     /* compute the execution time */
     clock_gettime(CLOCK_REALTIME, &start);
+
+#if defined(__OPT)
     findName(input, e, &index);
+#else
+    findName(input, e);
+#endif
     clock_gettime(CLOCK_REALTIME, &end);
     cpu_time2 = diff_in_second(start, end);
 
