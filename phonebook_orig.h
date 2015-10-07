@@ -14,7 +14,6 @@ typedef struct __PHONE_BOOK_ENTRY {
     char city[16];
     char state[2];
     char zip[5];
-    char zip2[5];
     struct __PHONE_BOOK_ENTRY *pNext;
 } entry;
 

@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     FILE *fp;
     int k, i = 0;
     char lines[N_LINES][MAX_LAST_NAME_SIZE];
-
+    int index;
     struct timespec start, end;
     double cpu_time1, cpu_time2;
 
@@ -74,17 +74,16 @@ int main(int argc, char *argv[])
     /* the givn last name to find */
     char input[MAX_LAST_NAME_SIZE] = "zyxel";
     e = pHead;
-
-    assert(findName(input, e) &&
+    assert(findName(input, e, &index) &&
            "Did you implement findName() in " IMPL "?");
-    assert(0 == strcmp(findName(input, e)->lastName, "zyxel"));
+    assert(0 == strcmp(findName(input, e, &index)->lastNames[index], "zyxel"));
 
 #if defined(__GNUC__)
     __builtin___clear_cache((char *) pHead, (char *) pHead + sizeof(entry));
 #endif
     /* compute the execution time */
     clock_gettime(CLOCK_REALTIME, &start);
-    findName(input, e);
+    findName(input, e, &index);
     clock_gettime(CLOCK_REALTIME, &end);
     cpu_time2 = diff_in_second(start, end);
 

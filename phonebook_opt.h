@@ -2,7 +2,7 @@
 #define _PHONEBOOK_H
 
 #define MAX_LAST_NAME_SIZE 16
-#define N_LINES 32
+#define N_LINES 127
 
 struct _details {
     char firstName[16];
@@ -17,13 +17,13 @@ struct _details {
 };
 
 typedef struct __PHONE_BOOK_ENTRY {
-    char lastName[MAX_LAST_NAME_SIZE];
+    char lastNames[N_LINES][MAX_LAST_NAME_SIZE];
 
-    struct _details *details;
+    struct _details *details[N_LINES];
 
     struct __PHONE_BOOK_ENTRY *pNext;
 } entry;
-entry *findName(char lastname[], entry *pHead);
-entry *append(char lastName[], entry *e);
+entry *findName(char lastname[], entry *pHead, int* index);
+entry *append_lines(char lastName[][MAX_LAST_NAME_SIZE], entry *e);
 
 #endif
