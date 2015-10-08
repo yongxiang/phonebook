@@ -1,7 +1,6 @@
 #ifndef _PHONEBOOK_H
 #define _PHONEBOOK_H
 
-#define __OPT
 #define MAX_LAST_NAME_SIZE 16
 #define N_LINES 127
 

@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 {
     FILE *fp;
     int k, i = 0;
-#if defined(__OPT)
+#ifdef MY_OPT
     char lines[N_LINES][MAX_LAST_NAME_SIZE];
 #else
     char line[MAX_LAST_NAME_SIZE];
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
     __builtin___clear_cache((char *) pHead, (char *) pHead + sizeof(entry));
 #endif
     clock_gettime(CLOCK_REALTIME, &start);
-#if defined(__OPT)
+#ifdef MY_OPT
     k=0;
     while (fgets(lines[k], sizeof(lines[k]), fp)) {
         while (lines[k][i] != '\0')
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
     /* the givn last name to find */
     char input[MAX_LAST_NAME_SIZE] = "zyxel";
     e = pHead;
-#if defined(__OPT)
+#ifdef MY_OPT
     assert(findName(input, e, &index) &&
            "Did you implement findName() in " IMPL "?");
     assert(0 == strcmp(findName(input, e, &index)->lastNames[index], "zyxel"));
@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
     /* compute the execution time */
     clock_gettime(CLOCK_REALTIME, &start);
 
-#if defined(__OPT)
+#ifdef MY_OPT
     findName(input, e, &index);
 #else
     findName(input, e);
