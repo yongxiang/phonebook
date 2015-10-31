@@ -4,7 +4,7 @@
 #define MAX_LAST_NAME_SIZE 16
 #define N_LINES 127
 
-struct _details {
+typedef struct _details {
     char firstName[16];
     char email[16];
     char phone[10];
@@ -14,7 +14,7 @@ struct _details {
     char city[16];
     char state[2];
     char zip[5];
-};
+} details;
 
 typedef struct __PHONE_BOOK_ENTRY {
     char lastNames[N_LINES][MAX_LAST_NAME_SIZE];
@@ -25,5 +25,5 @@ typedef struct __PHONE_BOOK_ENTRY {
 } entry;
 entry *findName(char lastname[], entry *pHead, int* index);
 entry *append_lines(char lastName[][MAX_LAST_NAME_SIZE], entry *e);
-
+entry *append_detail(entry *e);
 #endif

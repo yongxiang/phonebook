@@ -28,3 +28,22 @@ entry *append_lines(char Lines[][MAX_LAST_NAME_SIZE], entry *E)
     E = E->pNext;
     return E;
 }
+
+entry *append_detail(entry *E)
+{
+    int i;
+    for ( i=0; i<N_LINES; i++) {
+        E->details[i] = (details *) malloc(sizeof(details));
+        strcpy(E->details[i]->firstName , "abcabc" );
+        strcpy(E->details[i]->email , "xxx@xxx.xx");
+        strcpy(E->details[i]->phone , "0987654321");
+        strcpy(E->details[i]->cell , "0987654321");
+        strcpy(E->details[i]->addr1 , "123");
+        strcpy(E->details[i]->addr2 , "456");
+        strcpy(E->details[i]->city ,"XX");
+        strcpy(E->details[i]->state,"Y");
+        strcpy(E->details[i]->zip,"0000");
+    }
+    E = E->pNext;
+    return E;
+}

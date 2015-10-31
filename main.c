@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <assert.h>
+#include <pthread.h>
 
 #include IMPL
 
@@ -42,11 +43,12 @@ int main(int argc, char *argv[])
     }
 
     /* build the entry */
-    entry *pHead, *e;
+    entry *pHead, *e, *e_for_append_detail;
     pHead = (entry *) malloc(sizeof(entry));
     printf("size of entry : %lu bytes\n", sizeof(entry));
     e = pHead;
     e->pNext = NULL;
+    e_for_append_detail = e;
 
 #if defined(__GNUC__)
     __builtin___clear_cache((char *) pHead, (char *) pHead + sizeof(entry));
@@ -63,6 +65,7 @@ int main(int argc, char *argv[])
         if( k == N_LINES ) {
             k = 0;
             e = append_lines(lines, e);
+            append_detail(e);
         }
     }
     append_lines(lines,e);
