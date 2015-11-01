@@ -26,10 +26,11 @@ entry *append_lines(char Lines[][MAX_LAST_NAME_SIZE], entry *E)
         E->details[i] = NULL;
     }
     E = E->pNext;
+    E->pNext = NULL;
     return E;
 }
 
-entry *append_detail(entry *E)
+void append_detail(entry *E)
 {
     int i;
     for ( i=0; i<N_LINES; i++) {
@@ -44,6 +45,6 @@ entry *append_detail(entry *E)
         strcpy(E->details[i]->state,"Y");
         strcpy(E->details[i]->zip,"0000");
     }
-    E = E->pNext;
-    return E;
+
+    return ;
 }

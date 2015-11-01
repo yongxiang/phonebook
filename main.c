@@ -9,6 +9,42 @@
 
 #define DICT_FILE "./dictionary/words.txt"
 
+entry *e_append_detail;
+int append_done;
+pthread_mutex_t append_done_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+pthread_mutex_t pNext_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t pNext_cond = PTHREAD_COND_INITIALIZER;
+
+pthread_cond_t wait_thread_done_cond = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t wait_thread_done_mutex = PTHREAD_MUTEX_INITIALIZER;
+int is_thread_done;
+#ifdef MY_OPT
+void *append_detail_func()
+{
+    pthread_mutex_lock(&append_done_mutex);
+    while(!append_done || e_append_detail->pNext != NULL) {
+        pthread_mutex_unlock(&append_done_mutex);
+
+        append_detail(e_append_detail);
+
+        pthread_mutex_lock(&pNext_mutex);
+        if(e_append_detail->pNext == NULL && !append_done) { // wait for signal to continue
+            pthread_cond_wait(&pNext_cond,&pNext_mutex);
+        }
+        e_append_detail = e_append_detail->pNext;
+        pthread_mutex_unlock(&pNext_mutex);
+        pthread_mutex_lock(&append_done_mutex);
+    }
+    pthread_mutex_unlock(&append_done_mutex);
+
+    pthread_mutex_lock(&wait_thread_done_mutex);
+    is_thread_done = 1;
+    pthread_cond_signal(&wait_thread_done_cond);
+    pthread_mutex_unlock(&wait_thread_done_mutex);
+    pthread_exit(NULL);
+}
+#endif
 static double diff_in_second(struct timespec t1, struct timespec t2)
 {
     struct timespec diff;
@@ -24,14 +60,14 @@ static double diff_in_second(struct timespec t1, struct timespec t2)
 
 int main(int argc, char *argv[])
 {
+    int index;
     FILE *fp;
-    int k, i = 0;
+    int i = 0;
 #ifdef MY_OPT
     char lines[N_LINES][MAX_LAST_NAME_SIZE];
 #else
     char line[MAX_LAST_NAME_SIZE];
 #endif
-    int index;
     struct timespec start, end;
     double cpu_time1, cpu_time2;
 
@@ -43,19 +79,23 @@ int main(int argc, char *argv[])
     }
 
     /* build the entry */
-    entry *pHead, *e, *e_for_append_detail;
+    entry *pHead, *e;
     pHead = (entry *) malloc(sizeof(entry));
     printf("size of entry : %lu bytes\n", sizeof(entry));
     e = pHead;
     e->pNext = NULL;
-    e_for_append_detail = e;
+    e_append_detail = e;
 
 #if defined(__GNUC__)
     __builtin___clear_cache((char *) pHead, (char *) pHead + sizeof(entry));
 #endif
     clock_gettime(CLOCK_REALTIME, &start);
 #ifdef MY_OPT
-    k=0;
+    append_done = 0;
+    is_thread_done = 0;
+    pthread_t thread_append_detail;
+    pthread_create( &thread_append_detail, NULL, append_detail_func, NULL);
+    int k=0;
     while (fgets(lines[k], sizeof(lines[k]), fp)) {
         while (lines[k][i] != '\0')
             i++;
@@ -65,10 +105,17 @@ int main(int argc, char *argv[])
         if( k == N_LINES ) {
             k = 0;
             e = append_lines(lines, e);
-            append_detail(e);
         }
     }
     append_lines(lines,e);
+
+// append done
+    pthread_mutex_lock(&append_done_mutex);
+    pthread_mutex_lock(&pNext_mutex);
+    append_done = 1;
+    pthread_cond_broadcast(&pNext_cond);
+    pthread_mutex_unlock(&pNext_mutex);
+    pthread_mutex_unlock(&append_done_mutex);
 #else
     while (fgets(line, sizeof(line),fp)) {
         while (line[i] != '\0')
@@ -119,5 +166,12 @@ int main(int argc, char *argv[])
     /* FIXME: release all allocated entries */
     free(pHead);
 
+#ifdef MY_OPT
+    pthread_mutex_lock(&wait_thread_done_mutex);
+    while(!is_thread_done) {
+        pthread_cond_wait(&wait_thread_done_cond,&wait_thread_done_mutex);
+    }
+    pthread_mutex_unlock(&wait_thread_done_mutex);
+#endif
     return 0;
 }

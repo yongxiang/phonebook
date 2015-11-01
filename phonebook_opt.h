@@ -25,5 +25,5 @@ typedef struct __PHONE_BOOK_ENTRY {
 } entry;
 entry *findName(char lastname[], entry *pHead, int* index);
 entry *append_lines(char lastName[][MAX_LAST_NAME_SIZE], entry *e);
-entry *append_detail(entry *e);
+void append_detail(entry *e);
 #endif
